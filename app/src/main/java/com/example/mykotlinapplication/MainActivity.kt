@@ -4,13 +4,29 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.mykotlinapplication.ui.theme.MyKotlinApplicationTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,10 +36,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyKotlinApplicationTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    GamesScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
@@ -31,17 +44,59 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
+fun GamesScreen(
+    modifier: Modifier = Modifier,
+    vm: GamesViewModel = viewModel()
+) {
+    val games by vm.games.collectAsState()
+    val error by vm.error.collectAsState()
+
+    Column(
         modifier = modifier
-    )
+            .fillMaxSize()
+            .padding(12.dp)
+    ) {
+        Text("FreeToGame", style = MaterialTheme.typography.headlineSmall)
+        Spacer(modifier = Modifier.height(12.dp))
+
+        when {
+            error != null -> {
+                Text("Error: $error", color = MaterialTheme.colorScheme.error)
+            }
+
+            games.isEmpty() -> {
+                Text("Loading...")
+            }
+
+            else -> {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    items(games) { game ->
+                        GameRow(game)
+                    }
+                }
+            }
+        }
+    }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    MyKotlinApplicationTheme {
-        Greeting("Darth Vader")
+fun GameRow(game: Game) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.padding(12.dp)) {
+
+            AsyncImage(
+                model = game.thumbnail,
+                contentDescription = game.title,
+                modifier = Modifier.size(90.dp)
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column {
+                Text(game.title, style = MaterialTheme.typography.titleMedium)
+                Text("Genre: ${game.genre}")
+                Text("Platform: ${game.platform}")
+            }
+        }
     }
 }
