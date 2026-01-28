@@ -34,6 +34,7 @@ import com.example.mykotlinapplication.ui.theme.MyKotlinApplicationTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.Alignment
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
