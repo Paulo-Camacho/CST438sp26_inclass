@@ -1,5 +1,4 @@
 package com.example.mykotlinapplication
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -7,7 +6,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class GamesViewModel : ViewModel() {
-
     private val _games = MutableStateFlow<List<Game>>(emptyList())
     val games: StateFlow<List<Game>> = _games
 
@@ -19,9 +17,13 @@ class GamesViewModel : ViewModel() {
     val selectedDescriptionofGame: StateFlow<Description_of_Game?> = _selectedDescriptionofGame
 
     init {
+    var sortBy: String? = null
+    var category: String? = null
+
+    fun fetchGames() {
         viewModelScope.launch {
             try {
-                _games.value = RetrofitInstance.api.getGames()
+                _games.value = RetrofitInstance.api.getGames(sortBy, category)
             } catch (e: Exception) {
                 _error.value = e.message ?: "Unknown error"
             }
@@ -42,5 +44,9 @@ class GamesViewModel : ViewModel() {
 
     fun closeGameDetails() {
         _selectedDescriptionofGame.value = null
+    }
+}
+    init {
+        fetchGames()
     }
 }

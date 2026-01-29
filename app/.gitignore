@@ -168,6 +168,8 @@ obj/
 /out/
 
 # User-specific configurations
+.idea/
+*.iml
 .idea/caches/
 .idea/libraries/
 .idea/shelf/
