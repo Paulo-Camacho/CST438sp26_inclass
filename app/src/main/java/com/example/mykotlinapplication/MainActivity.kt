@@ -145,10 +145,10 @@ fun GamesScreen(
 
         when {
             error != null -> {
-                Text("Error: $error", color = MaterialTheme.colorScheme.error)
+                Text("SOMETHING WENT WRONG! : $error", color = MaterialTheme.colorScheme.error)
             }
             games.isEmpty() -> {
-                Text("Loading...")
+                Text("hold your horses...")
             }
             else -> {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
