@@ -15,8 +15,8 @@ class GamesViewModel : ViewModel() {
     val error: StateFlow<String?> = _error
 
     // NEW: selected game details
-    private val _selectedGameDetails = MutableStateFlow<GameDetails?>(null)
-    val selectedGameDetails: StateFlow<GameDetails?> = _selectedGameDetails
+    private val _selectedDescriptionofGame = MutableStateFlow<Description_of_Game?>(null)
+    val selectedDescriptionofGame: StateFlow<Description_of_Game?> = _selectedDescriptionofGame
 
     init {
         viewModelScope.launch {
@@ -32,8 +32,8 @@ class GamesViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 _error.value = null
-                _selectedGameDetails.value = null // show loading state
-                _selectedGameDetails.value = RetrofitInstance.api.getGameDetails(id)
+                _selectedDescriptionofGame.value = null // show loading state
+                _selectedDescriptionofGame.value = RetrofitInstance.api.getGameDetails(id)
             } catch (e: Exception) {
                 _error.value = e.message ?: "Unknown error"
             }
@@ -41,6 +41,6 @@ class GamesViewModel : ViewModel() {
     }
 
     fun closeGameDetails() {
-        _selectedGameDetails.value = null
+        _selectedDescriptionofGame.value = null
     }
 }

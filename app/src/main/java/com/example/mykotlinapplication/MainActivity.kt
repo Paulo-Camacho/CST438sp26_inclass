@@ -64,7 +64,7 @@ fun GamesScreen(
     val games by vm.games.collectAsState()
     val error by vm.error.collectAsState()
 
-    val selectedDetails by vm.selectedGameDetails.collectAsState()
+    val selectedDetails by vm.selectedDescriptionofGame.collectAsState()
 
     Column(
         modifier = modifier
@@ -148,7 +148,7 @@ fun GameRow(game: Game, onClick: () -> Unit) {
 }
 
 @Composable
-fun GameDetailsView(details: GameDetails) {
+fun GameDetailsView(details: Description_of_Game) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = details.title,

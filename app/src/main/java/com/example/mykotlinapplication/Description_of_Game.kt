@@ -1,6 +1,6 @@
 package com.example.mykotlinapplication
 
-data class GameDetails(
+data class Description_of_Game(
     val id: Int,
     val title: String,
     val thumbnail: String,

@@ -9,5 +9,5 @@ interface FreeToGameApi {
 
     // NEW: details endpoint
     @GET("api/game")
-    suspend fun getGameDetails(@Query("id") id: Int): GameDetails
+    suspend fun getGameDetails(@Query("id") id: Int): Description_of_Game
 }
