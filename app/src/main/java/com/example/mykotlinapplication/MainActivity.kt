@@ -23,11 +23,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.mykotlinapplication.ui.theme.MyKotlinApplicationTheme
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.Alignment
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,17 +41,34 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyKotlinApplicationTheme {
+                var showGames by rememberSaveable { mutableStateOf(false) }
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    GamesScreen(modifier = Modifier.padding(innerPadding))
+                    if (showGames) {
+                        GamesScreen(
+                            modifier = Modifier.padding(innerPadding),
+                            onBack = { showGames = false })
+                    } else {
+                        LandingScreen(
+                            modifier = Modifier.padding(innerPadding),
+                            onSearchGames = { showGames = true },
+                            onSignOut = {
+                                // TODO: When sign-in screen exists, navigate there.
+                                // For now you can just stay here or set showGames = false.
+                                showGames = false
+                            }
+                        )
+                    }
                 }
             }
         }
     }
 }
 
+
 @Composable
 fun GamesScreen(
     modifier: Modifier = Modifier,
+    onBack: () -> Unit,
     vm: GamesViewModel = viewModel()
 ) {
     val games by vm.games.collectAsState()
@@ -56,7 +79,28 @@ fun GamesScreen(
             .fillMaxSize()
             .padding(12.dp)
     ) {
-        Text("FreeToGame", style = MaterialTheme.typography.headlineSmall)
+        //Text("FreeToGame", style = MaterialTheme.typography.headlineSmall)
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "← Back",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .padding(end = 12.dp)
+                    .clickable { onBack() }
+            )
+
+            Text(
+                text = "FreeToGame",
+                style = MaterialTheme.typography.headlineSmall
+            )
+        }
+
+
+
         Spacer(modifier = Modifier.height(12.dp))
 
         when {
