@@ -48,5 +48,6 @@ class LandingScreenRandomTest {
 
         // After the callback runs, the LandingScreen should recompose and display the card's title
         composeTestRule.onNodeWithText("Test Game Title").assertIsDisplayed()
+
     }
 }

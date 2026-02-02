@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  *
  * This provides basic coverage for the landing page introduced in Issue #4.
  */
+
 class LandingScreenTest {
 
     @get:Rule
