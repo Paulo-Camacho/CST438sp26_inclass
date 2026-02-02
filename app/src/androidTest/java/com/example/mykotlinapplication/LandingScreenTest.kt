@@ -4,9 +4,9 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * UI tests for the LandingScreen composable.
@@ -17,7 +17,6 @@ import org.junit.Test
  *
  * This provides basic coverage for the landing page introduced in Issue #4.
  */
-
 class LandingScreenTest {
 
     @get:Rule
@@ -27,8 +26,12 @@ class LandingScreenTest {
     fun landingScreen_displaysTitleAndButtons() {
         composeTestRule.setContent {
             LandingScreen(
+                randomGame = null,
                 onSearchGames = {},
-                onSignOut = {}
+                onRandomRequested = {},
+                onClearRandom = {},
+                onSignOut = {},
+                onGameClick = {}
             )
         }
 
@@ -39,16 +42,21 @@ class LandingScreenTest {
 
     @Test
     fun landingScreen_searchGames_callsCallback() {
-        var clicked = false
+        val clicked = AtomicBoolean(false)
 
         composeTestRule.setContent {
             LandingScreen(
-                onSearchGames = { clicked = true },
-                onSignOut = {}
+                randomGame = null,
+                onSearchGames = { clicked.set(true) },
+                onRandomRequested = {},
+                onClearRandom = {},
+                onSignOut = {},
+                onGameClick = {}
             )
         }
 
         composeTestRule.onNodeWithText("Search Games").performClick()
-        assertTrue(clicked)
+        // run assertions after the click; AtomicBoolean is thread-safe
+        assert(clicked.get())
     }
 }
