@@ -17,6 +17,10 @@ class GamesViewModel : ViewModel() {
     private val _selectedDescriptionofGame = MutableStateFlow<Description_of_Game?>(null)
     val selectedDescriptionofGame: StateFlow<Description_of_Game?> = _selectedDescriptionofGame
 
+    // NEW: random suggestion
+    private val _randomGame = MutableStateFlow<Game?>(null)
+    val randomGame: StateFlow<Game?> = _randomGame
+
     // ✅ These must be class members (so MainActivity.kt can access them)
     var sortBy: String? = null
     var category: String? = null
@@ -49,5 +53,35 @@ class GamesViewModel : ViewModel() {
 
     fun closeGameDetails() {
         _selectedDescriptionofGame.value = null
+    }
+
+    /**
+     * Pick a random game to suggest. Prefer the already-fetched list (_games).
+     * If _games is empty (not loaded), attempt to fetch trending/popular list.
+     */
+    fun pickRandomGame() {
+        viewModelScope.launch {
+            try {
+                // If we already have games loaded, pick from them
+                val source = _games.value.ifEmpty {
+                    // Fallback: request popular (trending) list from API
+                    RetrofitInstance.api.getGames(sortBy = "popularity")
+                }
+
+                if (source.isNotEmpty()) {
+                    _randomGame.value = source.random()
+                } else {
+                    _randomGame.value = null
+                }
+            } catch (e: Exception) {
+                // keep random empty and surface error to _error if desired
+                _error.value = e.message ?: "Failed to load random game"
+                _randomGame.value = null
+            }
+        }
+    }
+
+    fun clearRandom() {
+        _randomGame.value = null
     }
 }

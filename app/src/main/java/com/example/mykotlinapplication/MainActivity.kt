@@ -54,22 +54,25 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MyKotlinApplicationTheme {
+                val vm: GamesViewModel = viewModel()
+                val random by vm.randomGame.collectAsState()
                 var showGames by rememberSaveable { mutableStateOf(false) }
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     if (showGames) {
                         GamesScreen(
                             modifier = Modifier.padding(innerPadding),
-                            onBack = { showGames = false }
+                            onBack = { showGames = false },
+                            vm = vm // reuse the same vm if you prefer
                         )
                     } else {
                         LandingScreen(
                             modifier = Modifier.padding(innerPadding),
+                            randomGame = random,
                             onSearchGames = { showGames = true },
-                            onSignOut = {
-                                // TODO: When sign-in screen exists, navigate there.
-                                // For now you can just stay here or set showGames = false.
-                                showGames = false
-                            }
+                            onRandomRequested = { vm.pickRandomGame() },
+                            onClearRandom = { vm.clearRandom() },
+                            onSignOut = { /* TODO: sign out */ }
                         )
                     }
                 }
