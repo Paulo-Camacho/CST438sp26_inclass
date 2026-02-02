@@ -72,8 +72,13 @@ class MainActivity : ComponentActivity() {
                             onSearchGames = { showGames = true },
                             onRandomRequested = { vm.pickRandomGame() },
                             onClearRandom = { vm.clearRandom() },
-                            onSignOut = { /* TODO: sign out */ }
+                            onSignOut = { /* TODO: sign out */ },
+                            onGameClick = { id ->
+                                vm.openGameDetails(id)
+                                showGames = true
+                            }
                         )
+
                     }
                 }
             }

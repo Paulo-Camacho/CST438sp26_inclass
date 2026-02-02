@@ -1,7 +1,7 @@
 package com.example.mykotlinapplication
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,6 +20,7 @@ fun LandingScreen(
     onRandomRequested: () -> Unit,
     onClearRandom: () -> Unit,
     onSignOut: () -> Unit,
+    onGameClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -29,7 +30,6 @@ fun LandingScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        // Title
         Text(
             text = "FreeToGame",
             style = MaterialTheme.typography.headlineMedium
@@ -37,16 +37,16 @@ fun LandingScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Random suggestion area (middle content)
+        // Random suggestion area: shown only when randomGame is present
         if (randomGame != null) {
-            RandomGameCard(game = randomGame, onClear = onClearRandom)
+            RandomGameCard(game = randomGame, onClear = onClearRandom, onClick = onGameClick)
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // This pushes the buttons to the bottom of the activity page
+        // This spacer pushes the button block to the bottom of the screen
         Spacer(modifier = Modifier.weight(1f))
 
-        // Buttons (bottom-anchored)
+        // Buttons (Search / Random / Sign out)
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -72,9 +72,7 @@ fun LandingScreen(
             Button(
                 onClick = onSignOut,
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error
-                )
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
                 Text("Sign Out")
             }
@@ -86,10 +84,12 @@ fun LandingScreen(
 }
 
 @Composable
-fun RandomGameCard(game: Game, onClear: () -> Unit) {
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .wrapContentHeight()
+fun RandomGameCard(game: Game, onClear: () -> Unit, onClick: (Int) -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .clickable { onClick(game.id) } // entire card is tappable to open details
     ) {
         Row(
             modifier = Modifier
