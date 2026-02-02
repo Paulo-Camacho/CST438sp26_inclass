@@ -29,14 +29,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.mykotlinapplication.ui.theme.MyKotlinApplicationTheme
+import com.example.mykotlinapplication.data.AppDatabase
+import com.example.mykotlinapplication.data.UserDao
+import com.example.mykotlinapplication.data.User
+import kotlinx.coroutines.launch
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val db = AppDatabase.getDatabase(this)
+        val userDao = db.userDao()
+
+        lifecycleScope.launch {
+            userDao.insert(User(username = "admin", password = "password"))
+
+        }
+
         setContent {
             MyKotlinApplicationTheme {
                 var showGames by rememberSaveable { mutableStateOf(false) }
@@ -110,7 +125,6 @@ fun GamesScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Updated to pass modifiers to handle weight/width if needed
             CustomDropdownMenu(
                 selected = sortBy,
                 onSelectedChange = {
@@ -191,6 +205,7 @@ fun CustomDropdownMenu(
             colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
             modifier = Modifier
                 .fillMaxWidth()
+                .menuAnchor()
         )
         ExposedDropdownMenu(
             expanded = expanded,
