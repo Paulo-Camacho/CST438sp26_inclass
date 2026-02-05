@@ -1,43 +1,32 @@
 package com.example.mykotlinapplication
 
 import android.os.Bundle
-import androidx.compose.runtime.saveable.rememberSaveable
-
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.clickable
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.example.mykotlinapplication.ui.theme.MyKotlinApplicationTheme
 import com.example.mykotlinapplication.data.AppDatabase
-import com.example.mykotlinapplication.data.UserDao
+import com.example.mykotlinapplication.data.Review
 import com.example.mykotlinapplication.data.User
+import com.example.mykotlinapplication.ui.theme.MyKotlinApplicationTheme
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +38,6 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             userDao.insert(User(username = "admin", password = "password"))
-
         }
 
         setContent {
@@ -63,7 +51,7 @@ class MainActivity : ComponentActivity() {
                         GamesScreen(
                             modifier = Modifier.padding(innerPadding),
                             onBack = { showGames = false },
-                            vm = vm // reuse the same vm if you prefer
+                            vm = vm
                         )
                     } else {
                         LandingScreen(
@@ -78,7 +66,6 @@ class MainActivity : ComponentActivity() {
                                 showGames = true
                             }
                         )
-
                     }
                 }
             }
@@ -87,7 +74,6 @@ class MainActivity : ComponentActivity() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-
 @Composable
 fun GamesScreen(
     modifier: Modifier = Modifier,
@@ -116,7 +102,6 @@ fun GamesScreen(
                 modifier = Modifier
                     .padding(end = 12.dp)
                     .clickable {
-                        // If currently viewing details, go back to list first. Otherwise, go back to landing screen.
                         if (selectedDetails != null) vm.closeGameDetails() else onBack()
                     }
             )
@@ -161,12 +146,9 @@ fun GamesScreen(
             error != null -> {
                 Text("SOMETHING WENT WRONG! : $error", color = MaterialTheme.colorScheme.error)
             }
-
-            // NEW: If a game is selected, show details instead of the list
             selectedDetails != null -> {
                 GameDetailsView(details = selectedDetails!!)
             }
-
             games.isEmpty() -> {
                 Text("hold your horses...")
             }
@@ -175,7 +157,7 @@ fun GamesScreen(
                     items(games) { game ->
                         GameRow(
                             game = game,
-                            onClick = { vm.openGameDetails(game.id) } // NEW
+                            onClick = { vm.openGameDetails(game.id) }
                         )
                     }
                 }
@@ -219,7 +201,7 @@ fun CustomDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            val items = if (label == "Sort By") {
+            val itemsList = if (label == "Sort By") {
                 listOf("alphabetical", "release-date", "popularity", "relevance")
             } else {
                 listOf(
@@ -232,9 +214,10 @@ fun CustomDropdownMenu(
                     "3d", "2d", "anime", "fantasy", "sci-fi",
                     "fighting", "action-rpg", "action", "military", "martial-arts",
                     "flight", "low-spec", "tower-defense", "horror", "mmorts"
-                )            }
+                )
+            }
 
-            items.forEach { item ->
+            itemsList.forEach { item ->
                 DropdownMenuItem(
                     text = { Text(item) },
                     onClick = {
@@ -252,7 +235,7 @@ fun GameRow(game: Game, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() } // NEW
+            .clickable { onClick() }
     ) {
         Row(modifier = Modifier.padding(12.dp)) {
             AsyncImage(
@@ -270,36 +253,159 @@ fun GameRow(game: Game, onClick: () -> Unit) {
     }
 }
 
+/**
+ * FIXED:
+ * - Uses ONE LazyColumn (no nested LazyColumn)
+ * - Adds missing imports via Material3.*
+ */
 @Composable
 fun GameDetailsView(details: Description_of_Game) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = details.title,
-            style = MaterialTheme.typography.headlineSmall
-        )
+    val context = LocalContext.current
+    val db = remember { AppDatabase.getDatabase(context) }
+    val reviewDao = remember { db.reviewDao() }
+    val scope = rememberCoroutineScope()
 
-        Spacer(modifier = Modifier.height(12.dp))
+    var rating by remember { mutableStateOf(0) }
+    var comment by remember { mutableStateOf("") }
+    var submitError by remember { mutableStateOf<String?>(null) }
 
-        AsyncImage(
-            model = details.thumbnail,
-            contentDescription = details.title,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-        )
+    val reviewsState = produceState<List<Review>>(initialValue = emptyList(), key1 = details.id) {
+        reviewDao.observeReviews(details.id).collectLatest { value = it }
+    }
 
-        Spacer(modifier = Modifier.height(12.dp))
+    val avgRatingState = produceState<Double?>(initialValue = null, key1 = details.id) {
+        reviewDao.observeAverageRating(details.id).collectLatest { value = it }
+    }
 
-        Text("Genre: ${details.genre}")
-        Text("Platform: ${details.platform}")
-        details.publisher?.let { Text("Publisher: $it") }
-        details.developer?.let { Text("Developer: $it") }
-        details.release_date?.let { Text("Release Date: $it") }
+    val reviews = reviewsState.value
+    val avg = avgRatingState.value
 
-        Spacer(modifier = Modifier.height(12.dp))
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        item {
+            Text(details.title, style = MaterialTheme.typography.headlineSmall)
+        }
+
+        item {
+            AsyncImage(
+                model = details.thumbnail,
+                contentDescription = details.title,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
+        }
+
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text("Genre: ${details.genre}")
+                Text("Platform: ${details.platform}")
+                details.publisher?.let { Text("Publisher: $it") }
+                details.developer?.let { Text("Developer: $it") }
+                details.release_date?.let { Text("Release Date: $it") }
+            }
+        }
 
         details.description?.let { desc ->
-            Text(desc, style = MaterialTheme.typography.bodyMedium)
+            item {
+                Text(desc, style = MaterialTheme.typography.bodyMedium)
+            }
+        }
+
+        item {
+            Divider()
+        }
+
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Ratings & Comments", style = MaterialTheme.typography.titleMedium)
+
+                Text(
+                    text = if (avg != null) "Average rating: ${"%.1f".format(avg)} / 5" else "Average rating: —"
+                )
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Your rating: ", modifier = Modifier.padding(end = 8.dp))
+                    (1..5).forEach { i ->
+                        Icon(
+                            imageVector = if (i <= rating) Icons.Filled.Star else Icons.Outlined.Star,
+                            contentDescription = "Star $i",
+                            modifier = Modifier
+                                .size(28.dp)
+                                .clickable { rating = i }
+                                .padding(end = 2.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(if (rating == 0) "None" else "$rating/5")
+                }
+
+                OutlinedTextField(
+                    value = comment,
+                    onValueChange = { comment = it },
+                    label = { Text("Add a comment (optional)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                submitError?.let {
+                    Text(it, color = MaterialTheme.colorScheme.error)
+                }
+
+                Button(
+                    onClick = {
+                        submitError = null
+                        val trimmed = comment.trim()
+                        val hasRating = rating in 1..5
+                        val hasComment = trimmed.isNotEmpty()
+
+                        if (!hasRating && !hasComment) {
+                            submitError = "Please add a rating or a comment."
+                            return@Button
+                        }
+
+                        scope.launch {
+                            reviewDao.insert(
+                                Review(
+                                    gameId = details.id,
+                                    rating = if (hasRating) rating else 0,
+                                    comment = trimmed
+                                )
+                            )
+                            rating = 0
+                            comment = ""
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Submit")
+                }
+            }
+        }
+
+        item {
+            Text("Recent", style = MaterialTheme.typography.titleSmall)
+        }
+
+        if (reviews.isEmpty()) {
+            item { Text("No ratings/comments yet.") }
+        } else {
+            items(reviews) { r ->
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        if (r.rating > 0) {
+                            Text("Rating: ${r.rating}/5", style = MaterialTheme.typography.titleSmall)
+                        }
+                        if (r.comment.isNotBlank()) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(r.comment)
+                        }
+                    }
+                }
+            }
         }
     }
 }
