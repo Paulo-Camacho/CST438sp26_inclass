@@ -4,6 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Database(
     entities = [User::class, Review::class],
@@ -26,8 +30,22 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "user_database"
                 )
-                    // you already had this; bumping version will recreate DB automatically
                     .fallbackToDestructiveMigration()
+                    .addCallback(object : RoomDatabase.Callback() {
+                        override fun onCreate(db: SupportSQLiteDatabase) {
+                            super.onCreate(db)
+
+                            // ✅ SEED ADMIN USER ON FIRST CREATE
+                            CoroutineScope(Dispatchers.IO).launch {
+                                INSTANCE?.userDao()?.insert(
+                                    User(
+                                        username = "admin",
+                                        password = "password"
+                                    )
+                                )
+                            }
+                        }
+                    })
                     .build()
 
                 INSTANCE = instance
