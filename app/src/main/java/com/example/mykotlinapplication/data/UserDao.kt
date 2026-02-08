@@ -6,14 +6,21 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
-//This contains the queries for the database.
 @Dao
 interface UserDao {
+
+    // ✅ Used by AuthViewModel.login()
+    @Query("""
+        SELECT * FROM user_table
+        WHERE username = :username
+        AND password = :password
+        LIMIT 1
+    """)
+    suspend fun login(username: String, password: String): User?
+
+
     @Query("SELECT * FROM user_table")
     suspend fun getAll(): List<User>
-
-    @Query("SELECT * FROM user_table WHERE username = :username LIMIT 1")
-    suspend fun findByUsername(username: String): User?
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(user: User)
