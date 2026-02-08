@@ -28,6 +28,7 @@ class LandingScreenTest {
         composeTestRule.setContent {
             LandingScreen(
                 randomGame = null,
+                popularGames = emptyList(),
                 onSearchGames = {},
                 onRandomRequested = {},
                 onClearRandom = {},
@@ -48,6 +49,7 @@ class LandingScreenTest {
         composeTestRule.setContent {
             LandingScreen(
                 randomGame = null,
+                popularGames = emptyList(),
                 onSearchGames = { clicked.set(true) },
                 onRandomRequested = {},
                 onClearRandom = {},

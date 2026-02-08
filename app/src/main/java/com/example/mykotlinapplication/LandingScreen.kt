@@ -2,6 +2,8 @@ package com.example.mykotlinapplication
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -12,10 +14,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun LandingScreen(
     randomGame: Game?,
+    popularGames: List<Game>,
     onSearchGames: () -> Unit,
     onRandomRequested: () -> Unit,
     onClearRandom: () -> Unit,
@@ -35,13 +39,39 @@ fun LandingScreen(
             style = MaterialTheme.typography.headlineMedium
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         // Random suggestion area: shown only when randomGame is present
         if (randomGame != null) {
             RandomGameCard(game = randomGame, onClear = onClearRandom, onClick = onGameClick)
             Spacer(modifier = Modifier.height(16.dp))
         }
+
+        Spacer(modifier = Modifier.height(80.dp))
+
+        Text(
+            text = "Top 10 Popular Games",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (popularGames.isEmpty()) {
+            Text("Loading popular games...")
+        } else {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(horizontal = 4.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(popularGames) { game ->
+                    PopularGameCard(game = game, onClick = { onGameClick(game.id) })
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // This spacer pushes the button block to the bottom of the screen
         Spacer(modifier = Modifier.weight(1f))
@@ -62,7 +92,11 @@ fun LandingScreen(
 
             Button(
                 onClick = onRandomRequested,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4CAF50), // Material Green 500
+                    contentColor = Color.White
+                )
             ) {
                 Text("Random Game")
             }
@@ -114,6 +148,37 @@ fun RandomGameCard(game: Game, onClear: () -> Unit, onClick: (Int) -> Unit) {
 
             IconButton(onClick = onClear) {
                 Icon(Icons.Default.Close, contentDescription = "Dismiss suggestion")
+            }
+        }
+    }
+}
+
+@Composable
+fun PopularGameCard(game: Game, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .width(180.dp)
+            .clickable { onClick() }
+    ) {
+        Column {
+            AsyncImage(
+                model = game.thumbnail,
+                contentDescription = game.title,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+            )
+            Column(modifier = Modifier.padding(8.dp)) {
+                Text(
+                    text = game.title,
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 2
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = game.platform,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
     }

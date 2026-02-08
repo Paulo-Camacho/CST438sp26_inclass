@@ -30,6 +30,7 @@ class LandingScreenRandomTest {
         composeTestRule.setContent {
             LandingScreen(
                 randomGame = randomState.value,
+                popularGames = emptyList(),
                 onSearchGames = { /* no-op */ },
                 onRandomRequested = {
                     // Simulate the ViewModel picking a random game
