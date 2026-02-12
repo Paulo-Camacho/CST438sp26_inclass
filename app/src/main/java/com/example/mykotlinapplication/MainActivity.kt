@@ -38,9 +38,14 @@ class MainActivity : ComponentActivity() {
                 val db = remember { AppDatabase.getDatabase(context) }
                 val userDao = remember { db.userDao() }
 
+
+                val sessionManager = remember { SessionManager(context) }
+
                 val authVm: AuthViewModel = viewModel(
-                    factory = AuthViewModelFactory(userDao)
+                    factory = AuthViewModelFactory(userDao, sessionManager)
                 )
+
+
 
                 val authState by authVm.authState.collectAsState()
                 val loginFailed by authVm.loginFailed.collectAsState()
