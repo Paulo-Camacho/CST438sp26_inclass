@@ -38,17 +38,18 @@ class MainActivity : ComponentActivity() {
                 val db = remember { AppDatabase.getDatabase(context) }
                 val userDao = remember { db.userDao() }
 
-
                 val sessionManager = remember { SessionManager(context) }
 
                 val authVm: AuthViewModel = viewModel(
                     factory = AuthViewModelFactory(userDao, sessionManager)
                 )
 
-
-
                 val authState by authVm.authState.collectAsState()
                 val loginFailed by authVm.loginFailed.collectAsState()
+
+                // ✅ ADD: admin state (requires AuthViewModel addition from earlier)
+                val isAdmin by authVm.isAdmin.collectAsState()
+                var showAdmin by rememberSaveable { mutableStateOf(false) }
 
                 val gamesVm: GamesViewModel = viewModel()
                 val random by gamesVm.randomGame.collectAsState()
@@ -69,30 +70,58 @@ class MainActivity : ComponentActivity() {
                             gamesVm.fetchPopularGames()
                         }
 
-                        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                            if (showGames) {
-                                GamesScreen(
-                                    modifier = Modifier.padding(innerPadding),
-                                    onBack = { showGames = false },
-                                    vm = gamesVm
-                                )
-                            } else {
-                                LandingScreen(
-                                    modifier = Modifier.padding(innerPadding),
-                                    randomGame = random,
-                                    popularGames = popularGames,
-                                    onSearchGames = { showGames = true },
-                                    onRandomRequested = { gamesVm.pickRandomGame() },
-                                    onClearRandom = { gamesVm.clearRandom() },
-                                    onSignOut = {
-                                        authVm.logout()
-                                        showGames = false
-                                    },
-                                    onGameClick = { id ->
-                                        gamesVm.openGameDetails(id)
-                                        showGames = true
+                        Scaffold(
+                            modifier = Modifier.fillMaxSize(),
+                            floatingActionButton = {
+                                // ✅ Admin entry point (only visible for admin, only on Landing)
+                                if (!showGames && !showAdmin && isAdmin) {
+                                    FloatingActionButton(onClick = { showAdmin = true }) {
+                                        Text("Admin")
                                     }
-                                )
+                                }
+                            }
+                        ) { innerPadding ->
+
+                            when {
+                                showAdmin -> {
+                                    AdminScreen(
+                                        userDao = userDao,
+                                        onBack = { showAdmin = false },
+                                        onSignOut = {
+                                            authVm.logout()
+                                            showAdmin = false
+                                            showGames = false
+                                        }
+                                    )
+                                }
+
+                                showGames -> {
+                                    GamesScreen(
+                                        modifier = Modifier.padding(innerPadding),
+                                        onBack = { showGames = false },
+                                        vm = gamesVm
+                                    )
+                                }
+
+                                else -> {
+                                    LandingScreen(
+                                        modifier = Modifier.padding(innerPadding),
+                                        randomGame = random,
+                                        popularGames = popularGames,
+                                        onSearchGames = { showGames = true },
+                                        onRandomRequested = { gamesVm.pickRandomGame() },
+                                        onClearRandom = { gamesVm.clearRandom() },
+                                        onSignOut = {
+                                            authVm.logout()
+                                            showGames = false
+                                            showAdmin = false
+                                        },
+                                        onGameClick = { id ->
+                                            gamesVm.openGameDetails(id)
+                                            showGames = true
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -276,7 +305,9 @@ fun GameDetailsView(details: Description_of_Game) {
             AsyncImage(
                 model = details.thumbnail,
                 contentDescription = details.title,
-                modifier = Modifier.fillMaxWidth().height(200.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
             )
         }
         item {
@@ -299,19 +330,21 @@ fun GameDetailsView(details: Description_of_Game) {
             )
         }
         item {
-            Button(onClick = {
-                scope.launch {
-                    reviewDao.insert(
-                        Review(
-                            gameId = details.id,
-                            rating = rating,
-                            comment = comment
+            Button(
+                onClick = {
+                    scope.launch {
+                        reviewDao.insert(
+                            Review(
+                                gameId = details.id,
+                                rating = rating,
+                                comment = comment
+                            )
                         )
-                    )
-                    rating = 0
-                    comment = ""
+                        rating = 0
+                        comment = ""
+                    }
                 }
-            }) {
+            ) {
                 Text("Submit")
             }
         }
