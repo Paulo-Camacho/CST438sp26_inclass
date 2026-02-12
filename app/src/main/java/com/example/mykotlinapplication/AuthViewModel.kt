@@ -25,6 +25,10 @@ class AuthViewModel(
     private val _loginFailed = MutableStateFlow(false)
     val loginFailed: StateFlow<Boolean> = _loginFailed
 
+    // ✅ ADD: admin flag (does NOT change existing authState behavior)
+    private val _isAdmin = MutableStateFlow(false)
+    val isAdmin: StateFlow<Boolean> = _isAdmin
+
     fun login(username: String, password: String) {
         viewModelScope.launch {
             val user = userDao.login(username.trim(), password.trim())
@@ -33,6 +37,10 @@ class AuthViewModel(
                 sessionManager.saveLogin()
                 _loginFailed.value = false
                 _authState.value = AuthState.LOGGED_IN
+
+                // ✅ ADD: mark admin if username is "admin"
+                _isAdmin.value = user.username.equals("admin", ignoreCase = true)
+
             } else {
                 _loginFailed.value = true
             }
@@ -43,5 +51,8 @@ class AuthViewModel(
         sessionManager.logout()
         _authState.value = AuthState.LOGGED_OUT
         _loginFailed.value = false
+
+        // ✅ ADD: reset admin flag
+        _isAdmin.value = false
     }
 }
