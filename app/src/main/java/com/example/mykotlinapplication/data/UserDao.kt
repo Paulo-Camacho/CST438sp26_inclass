@@ -9,7 +9,7 @@ import androidx.room.Query
 @Dao
 interface UserDao {
 
-    // ✅ Used by AuthViewModel.login()
+    //  Used by AuthViewModel.login()
     @Query("""
         SELECT * FROM user_table
         WHERE username = :username

@@ -30,7 +30,7 @@ class GamesViewModel : ViewModel() {
     private val _selectedDescriptionofGame = MutableStateFlow<Description_of_Game?>(null)
     val selectedDescriptionofGame: StateFlow<Description_of_Game?> = _selectedDescriptionofGame
 
-    // NEW: random suggestion
+    //  random suggestion
     private val _randomGame = MutableStateFlow<Game?>(null)
     val randomGame: StateFlow<Game?> = _randomGame
 
@@ -39,7 +39,7 @@ class GamesViewModel : ViewModel() {
     val popularGames: StateFlow<List<Game>> = _popularGames
 
 
-    // ✅ These must be class members (so MainActivity.kt can access them)
+    //  These must be class members (so MainActivity.kt can access them)
     var sortBy: String? = null
     var category: String? = null
 
@@ -86,7 +86,7 @@ class GamesViewModel : ViewModel() {
             try {
                 // If we already have games loaded, pick from them
                 val source = _games.value.ifEmpty {
-                    // Fallback: request popular (trending) list from API
+                    //  request popular (trending) list from API
                     RetrofitInstance.api.getGames(sortBy = "popularity")
                 }
 

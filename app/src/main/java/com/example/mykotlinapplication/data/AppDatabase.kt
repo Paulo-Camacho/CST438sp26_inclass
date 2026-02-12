@@ -35,7 +35,7 @@ abstract class AppDatabase : RoomDatabase() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
 
-                            // ✅ SEED ADMIN USER ON FIRST CREATE
+                            //  SEED ADMIN USER ON FIRST CREATE
                             CoroutineScope(Dispatchers.IO).launch {
                                 INSTANCE?.userDao()?.insert(
                                     User(

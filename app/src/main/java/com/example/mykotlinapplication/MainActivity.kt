@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
                 val authState by authVm.authState.collectAsState()
                 val loginFailed by authVm.loginFailed.collectAsState()
 
-                // ✅ ADD: admin state (requires AuthViewModel addition from earlier)
+                //  ADD: admin state (requires AuthViewModel addition from earlier)
                 val isAdmin by authVm.isAdmin.collectAsState()
                 var showAdmin by rememberSaveable { mutableStateOf(false) }
 
@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
                         Scaffold(
                             modifier = Modifier.fillMaxSize(),
                             floatingActionButton = {
-                                // ✅ Admin entry point (only visible for admin, only on Landing)
+                                //  Admin entry point (only visible for admin, only on Landing)
                                 if (!showGames && !showAdmin && isAdmin) {
                                     FloatingActionButton(onClick = { showAdmin = true }) {
                                         Text("Admin")
