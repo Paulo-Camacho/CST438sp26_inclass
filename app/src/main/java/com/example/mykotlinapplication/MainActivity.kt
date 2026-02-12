@@ -101,6 +101,7 @@ fun GamesScreen(
     val games by vm.games.collectAsState()
     val error by vm.error.collectAsState()
     val selectedDetails by vm.selectedDescriptionofGame.collectAsState()
+    val searchQuery by vm.searchQuery.collectAsState()
 
     var sortBy by remember { mutableStateOf("alphabetical") }
     var category by remember { mutableStateOf("") }
@@ -145,10 +146,21 @@ fun GamesScreen(
 
         Spacer(Modifier.height(12.dp))
 
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { vm.onSearchQueryChange(it) },
+            label = { Text("Search games by title...") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        Spacer(Modifier.height(12.dp))
+
         when {
             error != null -> Text("Error: $error", color = MaterialTheme.colorScheme.error)
             selectedDetails != null -> GameDetailsView(selectedDetails!!)
-            games.isEmpty() -> Text("Loading...")
+            games.isEmpty() && searchQuery.isEmpty() -> Text("Loading...")
+            games.isEmpty() && searchQuery.isNotEmpty() -> Text("No games with the name: \"$searchQuery\"")
             else -> LazyColumn {
                 items(games) { game ->
                     GameRow(game) { vm.openGameDetails(game.id) }

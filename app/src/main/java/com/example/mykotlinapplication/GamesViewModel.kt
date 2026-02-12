@@ -3,13 +3,26 @@ package com.example.mykotlinapplication
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class GamesViewModel : ViewModel() {
 
     private val _games = MutableStateFlow<List<Game>>(emptyList())
-    val games: StateFlow<List<Game>> = _games
+
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery
+
+    val games: StateFlow<List<Game>> = combine(_games, _searchQuery) { gamesList, query ->
+        if (query.isBlank()) {
+            gamesList
+        } else {
+            gamesList.filter { it.title.contains(query, ignoreCase = true) }
+        }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
@@ -27,6 +40,10 @@ class GamesViewModel : ViewModel() {
 
     init {
         fetchGames()
+    }
+
+    fun onSearchQueryChange(newQuery: String) {
+        _searchQuery.value = newQuery
     }
 
     fun fetchGames() {
