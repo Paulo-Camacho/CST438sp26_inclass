@@ -34,6 +34,11 @@ class GamesViewModel : ViewModel() {
     private val _randomGame = MutableStateFlow<Game?>(null)
     val randomGame: StateFlow<Game?> = _randomGame
 
+    // NEW: popular games for landing page carousel
+    private val _popularGames = MutableStateFlow<List<Game>>(emptyList())
+    val popularGames: StateFlow<List<Game>> = _popularGames
+
+
     // ✅ These must be class members (so MainActivity.kt can access them)
     var sortBy: String? = null
     var category: String? = null
@@ -101,4 +106,18 @@ class GamesViewModel : ViewModel() {
     fun clearRandom() {
         _randomGame.value = null
     }
+
+    fun fetchPopularGames() {
+        viewModelScope.launch {
+            try {
+                _error.value = null
+                val result = RetrofitInstance.api.getGames(sortBy = "popularity")
+                _popularGames.value = result.take(10)
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Failed to load popular games"
+                _popularGames.value = emptyList()
+            }
+        }
+    }
+
 }

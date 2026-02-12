@@ -52,6 +52,7 @@ class MainActivity : ComponentActivity() {
 
                 val gamesVm: GamesViewModel = viewModel()
                 val random by gamesVm.randomGame.collectAsState()
+                val popularGames by gamesVm.popularGames.collectAsState()
                 var showGames by rememberSaveable { mutableStateOf(false) }
 
                 when (authState) {
@@ -64,6 +65,10 @@ class MainActivity : ComponentActivity() {
                     }
 
                     AuthState.LOGGED_IN -> {
+                        LaunchedEffect(Unit) {
+                            gamesVm.fetchPopularGames()
+                        }
+
                         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                             if (showGames) {
                                 GamesScreen(
@@ -75,6 +80,7 @@ class MainActivity : ComponentActivity() {
                                 LandingScreen(
                                     modifier = Modifier.padding(innerPadding),
                                     randomGame = random,
+                                    popularGames = popularGames,
                                     onSearchGames = { showGames = true },
                                     onRandomRequested = { gamesVm.pickRandomGame() },
                                     onClearRandom = { gamesVm.clearRandom() },

@@ -80,10 +80,12 @@ Issues were used to track feature development and assign responsibilities to tea
 
 ## Pull Requests Thus Far
 
-| Linked PRs | Title | Author | Outcome | Date |
-|---:|---|---|---|---|
-
-| [#20](https://github.com/Paulo-Camacho/CST438sp26_inclass/pull/19) | login-page | @Paulo-Camacho| Merged | TBD |
+|                                                         Linked PRs | Title | Author | Outcome | Date       |
+|-------------------------------------------------------------------:|---|---|---|------------|
+| [#24](https://github.com/Paulo-Camacho/CST438sp26_inclass/pull/24) | Paulo/feature/login page | @Paulo-Camacho | Merged | 2026-02-08 |
+| [#22](https://github.com/Paulo-Camacho/CST438sp26_inclass/pull/22) | Login page is implemented. Database needs to be ironed out | @Paulo-Camacho | Closed (not merged) | 2026-02-05 |
+| [#21](https://github.com/Paulo-Camacho/CST438sp26_inclass/pull/21) | Added in the reviews feature at the bottom of the comment | @Paulo-Camacho | Merged | 2026-02-05 |
+| [#20](https://github.com/Paulo-Camacho/CST438sp26_inclass/pull/20) | Add Random Game suggestion feature to landing screen | @mreynoso123| Merged | 2026-02-04 |
 | [#19](https://github.com/Paulo-Camacho/CST438sp26_inclass/pull/19) | Created Database | @ciaranmoynihan | Merged | 2026-02-02 |
 | [#18](https://github.com/Paulo-Camacho/CST438sp26_inclass/pull/18) | Josh/feature/adding in the game description | @Affirmingfour61 | Merged | 2026-01-30 |
 | [#17](https://github.com/Paulo-Camacho/CST438sp26_inclass/pull/17) | 1st push added in the game description | @Affirmingfour61 | Closed (not merged) | 2026-01-29 |
