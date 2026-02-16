@@ -82,6 +82,10 @@ Issues were used to track feature development and assign responsibilities to tea
 
 |                                                         Linked PRs | Title | Author | Outcome | Date       |
 |-------------------------------------------------------------------:|---|---|---|------------|
+| [#29](https://github.com/Paulo-Camacho/CST438sp26_inclass/pull/29) | adding in some features for the AdminScreen | @Affirmingfour61 | Merged | 2026-02-12 |
+| [#28](https://github.com/Paulo-Camacho/CST438sp26_inclass/pull/28) | feat(auth): persist login state across app restarts | @Paulo-Camacho | Merged | 2026-02-12 |
+| [#26](https://github.com/Paulo-Camacho/CST438sp26_inclass/pull/26) | Created the search bar on the games list page | @ciaranmoynihan | Merged | 2026-02-12 |
+| [#25](https://github.com/Paulo-Camacho/CST438sp26_inclass/pull/25) | Add Popular Games carousel to landing screen | @mreynoso123 | Merged | 2026-02-12 |
 | [#24](https://github.com/Paulo-Camacho/CST438sp26_inclass/pull/24) | Paulo/feature/login page | @Paulo-Camacho | Merged | 2026-02-08 |
 | [#22](https://github.com/Paulo-Camacho/CST438sp26_inclass/pull/22) | Login page is implemented. Database needs to be ironed out | @Paulo-Camacho | Closed (not merged) | 2026-02-05 |
 | [#21](https://github.com/Paulo-Camacho/CST438sp26_inclass/pull/21) | Added in the reviews feature at the bottom of the comment | @Paulo-Camacho | Merged | 2026-02-05 |
