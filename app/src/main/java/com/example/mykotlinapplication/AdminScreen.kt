@@ -102,14 +102,7 @@ fun AdminScreen(
                             refresh()
                         }
 
-                        // If you DID NOT change DAO and still have insert(user: User) with Unit return,
-                        // then replace the block above with:
-                        //
-                        // userDao.insert(User(username = u, password = p))
-                        // snackbarHostState.showSnackbar("Added user \"$u\".")
-                        // newUsername = ""
-                        // newPassword = ""
-                        // refresh()
+
                     }
                 },
                 enabled = canAdd,
