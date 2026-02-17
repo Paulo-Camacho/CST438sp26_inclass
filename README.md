@@ -75,20 +75,20 @@ Carol mostly worked on getting the app to run faster, better, and higher.  She d
 [Link to my pull requests](https://github.com/Paulo-Camacho/CST438sp26_inclass/pulls?q=is%3Apr+is%3Aclosed+assignee%3Aciaranmoynihan) and [Link to my issues](https://github.com/Paulo-Camacho/CST438sp26_inclass/issues?q=is%3Aissue%20state%3Aclosed%20assignee%3Aciaranmoynihan)
 
 #### What was your role / which stories did you work on
-Carol mostly worked on getting the app to run faster, better, and higher.  She did the best work possible but her contributions were overpowered and not well received by the fans.
+I worked mainly on the sorting and filtering of the api results on the games page. I made the two dropdowns that allow the user to sort the list of games by alphabetical order, relevancy, and popularity, and the dropdown that allows the user to filter the list of games by genre. I also made the search bar, that allows the user to input the title of a game, and find that game. I also made the database that stores the user's login information and the commands to interact with the table.
 
 + What was the biggest challenge? 
-  + Managing pull requests and merges
+  + The biggest challenge for me was the ROOM database.
 + Why was it a challenge?
-  + We were all new to git/github and not everyone followed convention
+  + I had to read through a lot of documentation and worked on making sure that the inspector could see the table updating in real time.
   + How was the challenge addressed?
-  + I went to the TA for help and used ChatGPT and web resources to get more comfortable with git.
+  + By reading the documentation, and through trial and error, I ended up setting up the database just fine.
 + Favorite / most interesting part of this project
-  + Finally getting the IDs from the API calls to store in the ROOM database
+  + Working with the API for the dropdowns was interesting, and making sure that both worked and filtered at the same time was also fun to work on.
 + If you could do it over, what would you change?
-  + I would get the ROOM database setup FIRST
+  + Get the ROOM database figured out earlier, so we could have the API inteact more with our database in some form/feature.
 + What is the most valuable thing you learned?
-  + Do the work early and document EVERYTHING
+  + The value of testing/test files to make sure that the database was working properly.
 
 ## Conclusion
 
