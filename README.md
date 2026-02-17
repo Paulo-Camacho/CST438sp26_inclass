@@ -37,20 +37,18 @@ I was responsible for building the landing page after login. I implemented the R
 [Link to my pull requests](https://github.com/Paulo-Camacho/CST438sp26_inclass/pulls?q=is%3Apr+is%3Aclosed+author%3APaulo-Camacho) and [Link to my issues](https://github.com/Paulo-Camacho/CST438sp26_inclass/issues?q=is%3Aissue%20state%3Aclosed%20assignee%3APaulo-Camacho)
 
 #### What was your role / which stories did you work on
-Carol mostly worked on getting the app to run faster, better, and higher.  She did the best work possible but her contributions were overpowered and not well received by the fans.
+I worked on the initial app, the fetching of api, the login function, persistent login.
 
 + What was the biggest challenge? 
-  + Managing pull requests and merges
+  + The biggest challenge was merging everyone's commit such that there are no conflicts.
 + Why was it a challenge?
-  + We were all new to git/github and not everyone followed convention
-  + How was the challenge addressed?
-  + I went to the TA for help and used ChatGPT and web resources to get more comfortable with git.
+  + It was not that bad after getting the hang of the github ui.
 + Favorite / most interesting part of this project
-  + Finally getting the IDs from the API calls to store in the ROOM database
+  + My favorite part was getting more comfortable with version control.
 + If you could do it over, what would you change?
-  + I would get the ROOM database setup FIRST
+  + I would not change anything. I enjoyed working with my team and project.
 + What is the most valuable thing you learned?
-  + Do the work early and document EVERYTHING
+  + Doing the work early and labeling branches.
 
 ### Joshua Chavez
 [Link to my pull requests](https://github.com/Paulo-Camacho/CST438sp26_inclass/pulls?q=is%3Apr+is%3Aclosed+assignee%3AAffirmingfour61) and [Link to my issues](https://github.com/Paulo-Camacho/CST438sp26_inclass/issues?q=is%3Aissue%20state%3Aclosed%20assignee%3AAffirmingfour61)
