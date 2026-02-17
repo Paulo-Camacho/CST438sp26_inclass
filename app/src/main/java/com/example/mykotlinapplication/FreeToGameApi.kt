@@ -11,7 +11,6 @@ interface FreeToGameApi {
         @Query("category") category: String? = null
     ): List<Game>
 
-    // NEW: details endpoint
     @GET("api/game")
     suspend fun getGameDetails(@Query("id") id: Int): Description_of_Game
 
