@@ -46,9 +46,8 @@ class MainActivity : ComponentActivity() {
 
                 val authState by authVm.authState.collectAsState()
                 val loginFailed by authVm.loginFailed.collectAsState()
-
-                // ✅ ADD: admin state (requires AuthViewModel addition from earlier)
                 val isAdmin by authVm.isAdmin.collectAsState()
+
                 var showAdmin by rememberSaveable { mutableStateOf(false) }
 
                 val gamesVm: GamesViewModel = viewModel()
@@ -73,7 +72,6 @@ class MainActivity : ComponentActivity() {
                         Scaffold(
                             modifier = Modifier.fillMaxSize(),
                             floatingActionButton = {
-                                // ✅ Admin entry point (only visible for admin, only on Landing)
                                 if (!showGames && !showAdmin && isAdmin) {
                                     FloatingActionButton(onClick = { showAdmin = true }) {
                                         Text("Admin")
@@ -161,101 +159,14 @@ fun GamesScreen(
 
         Spacer(Modifier.height(12.dp))
 
-        Row {
-            CustomDropdownMenu(
-                selected = sortBy,
-                label = "Sort By",
-                modifier = Modifier.weight(1f),
-                onSelectedChange = {
-                    sortBy = it
-                    vm.sortBy = it
-                }
-            )
-            Spacer(Modifier.width(12.dp))
-            CustomDropdownMenu(
-                selected = category,
-                label = "Filter by Genre",
-                modifier = Modifier.weight(1f),
-                onSelectedChange = {
-                    category = it
-                    vm.category = it
-                    vm.fetchGames()
-                }
-            )
-        }
-
-        Spacer(Modifier.height(12.dp))
-
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { vm.onSearchQueryChange(it) },
-            label = { Text("Search games by title...") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-
-        Spacer(Modifier.height(12.dp))
-
         when {
             error != null -> Text("Error: $error", color = MaterialTheme.colorScheme.error)
             selectedDetails != null -> GameDetailsView(selectedDetails!!)
-            games.isEmpty() && searchQuery.isEmpty() -> Text("Loading...")
-            games.isEmpty() && searchQuery.isNotEmpty() -> Text("No games with the name: \"$searchQuery\"")
+            games.isEmpty() -> Text("Loading...")
             else -> LazyColumn {
                 items(games) { game ->
                     GameRow(game) { vm.openGameDetails(game.id) }
                 }
-            }
-        }
-
-        LaunchedEffect(sortBy) { vm.fetchGames() }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CustomDropdownMenu(
-    selected: String,
-    label: String,
-    modifier: Modifier = Modifier,
-    onSelectedChange: (String) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
-        modifier = modifier
-    ) {
-        OutlinedTextField(
-            value = selected,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(label) },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
-            },
-            modifier = Modifier.menuAnchor().fillMaxWidth()
-        )
-
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            val options = if (label == "Sort By") {
-                listOf("alphabetical", "release-date", "popularity", "relevance")
-            } else {
-                listOf("mmorpg", "shooter", "strategy", "moba", "racing", "sports")
-            }
-
-            options.forEach {
-                DropdownMenuItem(
-                    text = { Text(it) },
-                    onClick = {
-                        onSelectedChange(it)
-                        expanded = false
-                    }
-                )
             }
         }
     }
@@ -287,70 +198,103 @@ fun GameRow(game: Game, onClick: () -> Unit) {
 
 @Composable
 fun GameDetailsView(details: Description_of_Game) {
-    val context = LocalContext.current
-    val db = remember { AppDatabase.getDatabase(context) }
-    val reviewDao = remember { db.reviewDao() }
-    val scope = rememberCoroutineScope()
 
-    var rating by remember { mutableStateOf(0) }
-    var comment by remember { mutableStateOf("") }
+    key(details.id) {
 
-    val reviews = produceState<List<Review>>(emptyList(), details.id) {
-        reviewDao.observeReviews(details.id).collectLatest { value = it }
-    }.value
+        val context = LocalContext.current
+        val db = remember { AppDatabase.getDatabase(context) }
+        val reviewDao = remember { db.reviewDao() }
+        val scope = rememberCoroutineScope()
 
-    LazyColumn(Modifier.padding(12.dp)) {
-        item { Text(details.title, style = MaterialTheme.typography.headlineSmall) }
-        item {
-            AsyncImage(
-                model = details.thumbnail,
-                contentDescription = details.title,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-            )
-        }
-        item {
-            Row {
-                (1..5).forEach {
-                    Icon(
-                        imageVector = if (it <= rating) Icons.Filled.Star else Icons.Outlined.Star,
-                        contentDescription = null,
-                        modifier = Modifier.clickable { rating = it }
-                    )
+        var rating by remember(details.id) { mutableStateOf(0) }
+        var comment by remember(details.id) { mutableStateOf("") }
+
+        val reviews = produceState<List<Review>>(emptyList(), details.id) {
+            reviewDao.observeReviews(details.id).collectLatest { value = it }
+        }.value
+
+        LazyColumn(Modifier.padding(12.dp)) {
+
+            item {
+                Text(
+                    details.title,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
+
+            item {
+                AsyncImage(
+                    model = details.thumbnail,
+                    contentDescription = details.title,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                )
+            }
+
+            item { Spacer(Modifier.height(12.dp)) }
+            item { Text("Genre: ${details.genre}") }
+            item { Text("Platform: ${details.platform}") }
+            details.publisher?.let { item { Text("Publisher: $it") } }
+            details.developer?.let { item { Text("Developer: $it") } }
+            details.release_date?.let { item { Text("Release Date: $it") } }
+
+            details.description?.let { desc ->
+                item {
+                    Spacer(Modifier.height(12.dp))
+                    Text(desc, style = MaterialTheme.typography.bodyMedium)
                 }
             }
-        }
-        item {
-            OutlinedTextField(
-                value = comment,
-                onValueChange = { comment = it },
-                label = { Text("Comment") },
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-        item {
-            Button(
-                onClick = {
-                    scope.launch {
-                        reviewDao.insert(
-                            Review(
-                                gameId = details.id,
-                                rating = rating,
-                                comment = comment
-                            )
+
+            item { Spacer(Modifier.height(12.dp)) }
+
+            item {
+                Row {
+                    (1..5).forEach {
+                        Icon(
+                            imageVector = if (it <= rating)
+                                Icons.Filled.Star
+                            else
+                                Icons.Outlined.Star,
+                            contentDescription = null,
+                            modifier = Modifier.clickable { rating = it }
                         )
-                        rating = 0
-                        comment = ""
                     }
                 }
-            ) {
-                Text("Submit")
             }
-        }
 
-        items(reviews) {
-            Text("★ ${it.rating}: ${it.comment}")
+            item {
+                OutlinedTextField(
+                    value = comment,
+                    onValueChange = { comment = it },
+                    label = { Text("Comment") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            item {
+                Button(
+                    onClick = {
+                        scope.launch {
+                            reviewDao.insert(
+                                Review(
+                                    gameId = details.id,
+                                    rating = rating,
+                                    comment = comment
+                                )
+                            )
+                            rating = 0
+                            comment = ""
+                        }
+                    }
+                ) {
+                    Text("Submit")
+                }
+            }
+
+            items(reviews) {
+                Text("★ ${it.rating}: ${it.comment}")
+            }
         }
     }
 }

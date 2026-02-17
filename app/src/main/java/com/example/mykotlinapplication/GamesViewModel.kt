@@ -30,18 +30,20 @@ class GamesViewModel : ViewModel() {
     private val _selectedDescriptionofGame = MutableStateFlow<Description_of_Game?>(null)
     val selectedDescriptionofGame: StateFlow<Description_of_Game?> = _selectedDescriptionofGame
 
-    // NEW: random suggestion
+    // Random suggestion
     private val _randomGame = MutableStateFlow<Game?>(null)
     val randomGame: StateFlow<Game?> = _randomGame
 
-    // NEW: popular games for landing page carousel
+    // Popular games for landing page carousel
     private val _popularGames = MutableStateFlow<List<Game>>(emptyList())
     val popularGames: StateFlow<List<Game>> = _popularGames
 
-
-    // ✅ These must be class members (so MainActivity.kt can access them)
+    // These must be class members (so MainActivity.kt can access them)
     var sortBy: String? = null
     var category: String? = null
+
+    // Added: used to prevent late network responses from overwriting newest selection
+    private var lastRequestedDetailsId: Int? = null
 
     init {
         fetchGames()
@@ -66,7 +68,19 @@ class GamesViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 _error.value = null
-                _selectedDescriptionofGame.value = RetrofitInstance.api.getGameDetails(id)
+
+                // Clear previous details so UI doesn't keep showing old content
+                _selectedDescriptionofGame.value = null
+
+                // Track the latest requested id
+                lastRequestedDetailsId = id
+
+                val details = RetrofitInstance.api.getGameDetails(id)
+
+                // Only apply if this response matches the latest request
+                if (lastRequestedDetailsId == id) {
+                    _selectedDescriptionofGame.value = details
+                }
             } catch (e: Exception) {
                 _error.value = e.message ?: "Unknown error"
             }
@@ -74,6 +88,7 @@ class GamesViewModel : ViewModel() {
     }
 
     fun closeGameDetails() {
+        lastRequestedDetailsId = null
         _selectedDescriptionofGame.value = null
     }
 
@@ -84,9 +99,7 @@ class GamesViewModel : ViewModel() {
     fun pickRandomGame() {
         viewModelScope.launch {
             try {
-                // If we already have games loaded, pick from them
                 val source = _games.value.ifEmpty {
-                    // Fallback: request popular (trending) list from API
                     RetrofitInstance.api.getGames(sortBy = "popularity")
                 }
 
@@ -96,7 +109,6 @@ class GamesViewModel : ViewModel() {
                     _randomGame.value = null
                 }
             } catch (e: Exception) {
-                // keep random empty and surface error to _error if desired
                 _error.value = e.message ?: "Failed to load random game"
                 _randomGame.value = null
             }
@@ -119,5 +131,4 @@ class GamesViewModel : ViewModel() {
             }
         }
     }
-
 }
