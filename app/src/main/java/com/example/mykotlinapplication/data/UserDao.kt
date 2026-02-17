@@ -9,7 +9,6 @@ import androidx.room.Query
 @Dao
 interface UserDao {
 
-    // ✅ Used by AuthViewModel.login()
     @Query("""
         SELECT * FROM user_table
         WHERE username = :username
@@ -18,12 +17,11 @@ interface UserDao {
     """)
     suspend fun login(username: String, password: String): User?
 
-
     @Query("SELECT * FROM user_table")
     suspend fun getAll(): List<User>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(user: User)
+    suspend fun insert(user: User): Long
 
     @Delete
     suspend fun delete(user: User)
