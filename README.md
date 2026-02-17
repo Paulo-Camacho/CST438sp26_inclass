@@ -5,7 +5,7 @@
 [Github Repo](https://github.com/Paulo-Camacho/CST438sp26_inclass)
 
 ## Overview
-A web application that recommends video games to users based on selected preferences such as genre, platform, and play style. Users can explore games, view details, and receive random recommendations [using a public game API(Free-To-Play)](https://www.freetogame.com/api-doc).
+A web application that recommends video games to users based on selected preferences such as genre, platform, and play style. Users can explore games, view details, and receive random recommendations [using a public game API (Free-To-Play)](https://www.freetogame.com/api-doc).
 
 ## Introduction
 
