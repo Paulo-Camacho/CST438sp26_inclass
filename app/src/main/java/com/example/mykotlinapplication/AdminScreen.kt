@@ -24,11 +24,11 @@ fun AdminScreen(
 
     var users by remember { mutableStateOf<List<User>>(emptyList()) }
 
-    // ✅ Add-user form state
+    //  Add-user form state
     var newUsername by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
 
-    // ✅ Snackbar
+    //  Snackbar
     val snackbarHostState = remember { SnackbarHostState() }
 
     fun refresh() {
@@ -57,7 +57,7 @@ fun AdminScreen(
                 .padding(16.dp)
         ) {
 
-            // ✅ Add User Section
+            //  Add User Section
             Text("Add User", style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
 
@@ -90,7 +90,7 @@ fun AdminScreen(
                         val u = newUsername.trim()
                         val p = newPassword.trim()
 
-                        // ✅ If you updated DAO to return Long:
+                        //  If you updated DAO to return Long:
                         val result = userDao.insert(User(username = u, password = p))
 
                         if (result == -1L) {
@@ -122,7 +122,7 @@ fun AdminScreen(
             Divider()
             Spacer(Modifier.height(12.dp))
 
-            // ✅ Existing users list
+            //  Existing users list
             if (users.isEmpty()) {
                 Text("No users found.")
             } else {
