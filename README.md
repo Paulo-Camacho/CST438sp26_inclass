@@ -1,6 +1,6 @@
 # Project 01 Retrospective and overview
 
-[Video Walkthrough](INSERT HYPERLINK HERE) 
+[Video Walkthrough](https://youtube.com/shorts/yxECam1A5QM?si=1IvXp443fGK2E22e) 
 
 [Github Repo](https://github.com/Paulo-Camacho/CST438sp26_inclass)
 
