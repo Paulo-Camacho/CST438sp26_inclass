@@ -106,7 +106,10 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier.padding(innerPadding),
                                         randomGame = random,
                                         popularGames = popularGames,
+
+                                        // Keep your navigation behavior exactly
                                         onSearchGames = { showGames = true },
+
                                         onRandomRequested = { gamesVm.pickRandomGame() },
                                         onClearRandom = { gamesVm.clearRandom() },
                                         onSignOut = {
@@ -141,8 +144,29 @@ fun GamesScreen(
     val selectedDetails by vm.selectedDescriptionofGame.collectAsState()
     val searchQuery by vm.searchQuery.collectAsState()
 
+    // Kept like your original code (local state)
     var sortBy by remember { mutableStateOf("alphabetical") }
     var category by remember { mutableStateOf("") }
+
+    // Dropdown UI state
+    var sortExpanded by remember { mutableStateOf(false) }
+    var categoryExpanded by remember { mutableStateOf(false) }
+
+    // Options (edit these to match what your API supports)
+    val sortOptions = listOf(
+        "alphabetical" to "Alphabetical",
+        "popularity" to "Popularity",
+        "release-date" to "Release Date"
+    )
+
+    val categoryOptions = listOf(
+        "" to "All",
+        "shooter" to "Shooter",
+        "mmorpg" to "MMORPG",
+        "strategy" to "Strategy",
+        "racing" to "Racing",
+        "sports" to "Sports"
+    )
 
     Column(modifier = modifier.padding(12.dp)) {
 
@@ -159,6 +183,86 @@ fun GamesScreen(
 
         Spacer(Modifier.height(12.dp))
 
+        // Only show filters/search when we're on the list screen
+        if (selectedDetails == null) {
+
+            // Search field (uses your existing VM search filter)
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { vm.onSearchQueryChange(it) },
+                label = { Text("Search games") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            // Sort + Category dropdowns
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+
+                // Sort dropdown
+                Box(modifier = Modifier.weight(1f)) {
+                    OutlinedButton(
+                        onClick = { sortExpanded = true },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        val sortLabel = sortOptions.firstOrNull { it.first == sortBy }?.second ?: "Sort"
+                        Text("Sort: $sortLabel")
+                    }
+
+                    DropdownMenu(
+                        expanded = sortExpanded,
+                        onDismissRequest = { sortExpanded = false }
+                    ) {
+                        sortOptions.forEach { (value, label) ->
+                            DropdownMenuItem(
+                                text = { Text(label) },
+                                onClick = {
+                                    sortBy = value
+                                    vm.sortBy = value
+                                    vm.fetchGames()
+                                    sortExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                // Category dropdown
+                Box(modifier = Modifier.weight(1f)) {
+                    OutlinedButton(
+                        onClick = { categoryExpanded = true },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        val catLabel = categoryOptions.firstOrNull { it.first == category }?.second ?: "Category"
+                        Text("Category: $catLabel")
+                    }
+
+                    DropdownMenu(
+                        expanded = categoryExpanded,
+                        onDismissRequest = { categoryExpanded = false }
+                    ) {
+                        categoryOptions.forEach { (value, label) ->
+                            DropdownMenuItem(
+                                text = { Text(label) },
+                                onClick = {
+                                    category = value
+                                    vm.category = if (value.isBlank()) null else value
+                                    vm.fetchGames()
+                                    categoryExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(12.dp))
+        }
+
         when {
             error != null -> Text("Error: $error", color = MaterialTheme.colorScheme.error)
             selectedDetails != null -> GameDetailsView(selectedDetails!!)
@@ -171,6 +275,7 @@ fun GamesScreen(
         }
     }
 }
+
 
 @Composable
 fun GameRow(game: Game, onClick: () -> Unit) {
@@ -252,10 +357,7 @@ fun GameDetailsView(details: Description_of_Game) {
                 Row {
                     (1..5).forEach {
                         Icon(
-                            imageVector = if (it <= rating)
-                                Icons.Filled.Star
-                            else
-                                Icons.Outlined.Star,
+                            imageVector = if (it <= rating) Icons.Filled.Star else Icons.Outlined.Star,
                             contentDescription = null,
                             modifier = Modifier.clickable { rating = it }
                         )
