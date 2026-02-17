@@ -54,7 +54,7 @@ I worked on the initial app, the fetching of api, the login function, persistent
 [Link to my pull requests](https://github.com/Paulo-Camacho/CST438sp26_inclass/pulls?q=is%3Apr+is%3Aclosed+assignee%3AAffirmingfour61) and [Link to my issues](https://github.com/Paulo-Camacho/CST438sp26_inclass/issues?q=is%3Aissue%20state%3Aclosed%20assignee%3AAffirmingfour61)
 
 #### What was your role / which stories did you work on
-Carol mostly worked on getting the app to run faster, better, and higher.  She did the best work possible but her contributions were overpowered and not well received by the fans.
+I worked mainly on the admin system, game details, and review functionality. I implemented the admin section that allows an admin user to add new users to the database and remove existing users. I also developed the game details view, which lets users click on a game to see a full description, including additional information such as genre, platform, publisher, and release date. In addition, I created the user review system at the bottom of the game details page, where users can rate a game using stars and leave a comment, with the reviews being stored and displayed from the database.
 
 + What was the biggest challenge? 
   + Managing pull requests and merges
