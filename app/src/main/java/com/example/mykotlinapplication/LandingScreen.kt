@@ -4,17 +4,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.ui.graphics.Color
 
 @Composable
 fun LandingScreen(
@@ -41,7 +39,6 @@ fun LandingScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Random suggestion area: shown only when randomGame is present
         if (randomGame != null) {
             RandomGameCard(game = randomGame, onClear = onClearRandom, onClick = onGameClick)
             Spacer(modifier = Modifier.height(16.dp))
@@ -73,10 +70,8 @@ fun LandingScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // This spacer pushes the button block to the bottom of the screen
         Spacer(modifier = Modifier.weight(1f))
 
-        // Buttons (Search / Random / Sign out)
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -94,7 +89,7 @@ fun LandingScreen(
                 onClick = onRandomRequested,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50), // Material Green 500
+                    containerColor = Color(0xFF4CAF50),
                     contentColor = Color.White
                 )
             ) {
@@ -111,7 +106,6 @@ fun LandingScreen(
                 Text("Sign Out")
             }
 
-            //Spacer to float the buttons slightly above the bottom edge.
             Spacer(modifier = Modifier.height(8.dp))
         }
     }
@@ -123,7 +117,7 @@ fun RandomGameCard(game: Game, onClear: () -> Unit, onClick: (Int) -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .clickable { onClick(game.id) } // entire card is tappable to open details
+            .clickable { onClick(game.id) }
     ) {
         Row(
             modifier = Modifier
